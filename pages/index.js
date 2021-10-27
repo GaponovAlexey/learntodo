@@ -1,58 +1,39 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { addTodo, removeTodow } from "../src/redux/reduser"
 
 export default function Home() {
-  const [todos, setTodo] = useState([])
   const [text, setText] = useState('')
+  const state = useSelector(state => state.todos.todos)
+  const dispatch = useDispatch()
 
-  const addTodo = () => {
+
+
+  const send = () => {
     if (text.trim().length) {
-      setTodo([
-        {
-          id: Date.now().toString(),
-          text,
-          completed: false
-        },
-        ...todos,
-      ])
-      setText('')
+      dispatch(addTodo(text))
     }
+    setText('')
   }
 
-  const removeid = (id) => {
-    setTodo(todos.filter(e => e.id !== id))
-  }
-
-  const toggleTodo = (todoid) => {
-    setTodo(
-      todos.map(
-        todo => {
-          if (todo.id !== todoid) return todo
-          return {
-            completed: !todo.completed,
-            ...todo,
-          }
-        })
-    )
+  const removeTodo = (id) => {
+    dispatch(removeTodow(id))
   }
 
 
   return (
-    <div>
-      <div>
+    <div style={ { display: 'flex' } } >
+      <div >
         <input value={ text } onChange={ (e) => setText(e.target.value) } />
-        <button onClick={ addTodo }>add todo</button>
+        <button onClick={ send } >send</button>
+        <div>
+          { state.map(e => <h1 key={ e.id }>
+            <div>{ e.text }</div>
+            <button onClick={ () => removeTodo(e.id) } >del</button>
+          </h1>) }
+
+        </div>
       </div>
-      <ul>
-        {
-          todos.map(todo => <h1 key={ todo.id }>
-            <input type='checkbox' checked={ todo.completed } onChange={ () => toggleTodo(todo.id) } />
-            <span> { todo.text }</span>
-            <span
-              onClick={ () => removeid(todo.id) }
-              style={ { color: 'red' } } >&times;</span>
-          </h1>)
-        }
-      </ul>
     </div>
   )
 }
