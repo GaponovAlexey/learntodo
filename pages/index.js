@@ -1,50 +1,36 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { addTodo, removeTodow, completedType, fetchAction } from "../src/redux/reduser"
+import { addTodo, addAction, togleAction, fetchAction, deletAction } from "../src/redux/reduser"
+import { Newform } from "./Newform"
+import { TodoList } from "./TodoList"
 
 export default function Home() {
-  const [todos, setText] = useState('')
-  const state = useSelector(state => state.todos.todos)
+  const [text, setText] = useState('')
   const { status, error } = useSelector(state => state.todos)
   const dispatch = useDispatch()
 
-
   const send = () => {
-    if (todos.trim().length) {
-      dispatch(addTodo(todos))
+    console.log('da');
+    if (text.trim().length) {
+      dispatch(addAction(text))
+      setText('')
     }
-    setText('')
   }
 
   const removeTodo = (id) => {
-    dispatch(removeTodow(id))
+    dispatch(deletAction(id))
   }
   useEffect(() => {
     dispatch(fetchAction())
-  }, [dispatch])
+  }, [dispatch, togleAction])
 
   return (
     <div>
-
+      <Newform value={ text } updateText={ setText } addAction={ send } />
+      <TodoList removeTodo={ removeTodo } />
+      {/*<View state={ state } deletAction={ deletAction } status={ status } error={ error } send={ send } removeTodo={ removeTodo } />*/ }
       { status === 'lodading' && <h2>Loading...</h2> }
       { error && <h2>Error...{ error }</h2> }
-      <div style={ { display: 'flex' } } >
-        <div >
-          <input value={ todos } onChange={ (e) => setText(e.target.value) } />
-          <button onClick={ send } >send</button>
-          <div  >
-            { state.map(e =>
-              <div key={ e.id }>
-                <h1 style={ { display: 'flex' } } >
-                  <input type={ "checkbox" } checked={ state.completed } onChange={ () => dispatch(completedType(e.id)) } />
-                  { e.title } 
-                  <div style={ { color: 'red', fontSize: 16 } } onClick={ () => removeTodo(e.id) } >&times;</div>
-                </h1>
-              </div>
-            ) }
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
